@@ -1,0 +1,9 @@
+[submodule "submodules/harfbuzz"]
+	path = submodules/harfbuzz
+	url = https://github.com/harfbuzz/harfbuzz
+[submodule "submodules/SheenBidi"]
+	path = submodules/SheenBidi
+	url = https://github.com/Tehreer/SheenBidi
+[submodule "submodules/rive-cpp"]
+	path = submodules/rive-cpp
+	url = https://github.com/rive-app/rive-cpp
