@@ -17,4 +17,4 @@ bitflags = "2.4.0"
 bytemuck = { version = "1.14.0", optional = true }
 image = { version = "0.24.6", optional = true }
 smallvec = { version = "1.8.0", optional = true }
-vello = { workspace = true, optional = true }
+vello = { git = "https://github.com/linebender/vello", rev = "ee3a076", optional = true }
