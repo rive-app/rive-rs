@@ -4,7 +4,7 @@ use alloc::{boxed::Box, string::String};
 
 use crate::{
     artboard::Artboard,
-    instantiate::Instantiate,
+    instantiate::{Handle, Instantiate},
     linear_animation::{LinearAnimation, Loop},
     renderer::Renderer,
     state_machine::StateMachine,
@@ -210,11 +210,11 @@ pub(crate) use impl_scene;
 impl<R: Renderer> Instantiate for Box<dyn Scene<R>> {
     type From = Artboard<R>;
 
-    fn instantiate(from: &Self::From, index: Option<usize>) -> Option<Self> {
-        StateMachine::instantiate(from, index)
+    fn instantiate(from: &Self::From, handle: Handle) -> Option<Self> {
+        StateMachine::instantiate(from, handle.clone())
             .map(|sm| Box::new(sm) as Box<dyn Scene<R>>)
             .or_else(|| {
-                LinearAnimation::instantiate(from, index)
+                LinearAnimation::instantiate(from, handle)
                     .map(|la| Box::new(la) as Box<dyn Scene<R>>)
             })
     }

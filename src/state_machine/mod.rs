@@ -4,7 +4,7 @@ use core::{fmt, marker::PhantomData, ptr::NonNull};
 use crate::{
     artboard::{Artboard, ArtboardInner},
     ffi,
-    instantiate::Instantiate,
+    instantiate::{Handle, Instantiate},
     renderer::Renderer,
     scene::impl_scene,
 };
@@ -27,15 +27,32 @@ impl<R: Renderer> Instantiate for StateMachine<R> {
     type From = Artboard<R>;
 
     #[inline]
-    fn instantiate(artboard: &Self::From, index: Option<usize>) -> Option<Self> {
+    fn instantiate(artboard: &Self::From, handle: Handle) -> Option<Self> {
         let mut raw_state_machine: Option<NonNull<ffi::StateMachine>> = None;
 
-        unsafe {
-            ffi::rive_rs_instantiate_state_machine(
-                artboard.as_inner().raw_artboard,
-                index.as_ref().map(|val| val.into()),
-                &mut raw_state_machine,
-            );
+        match handle {
+            Handle::Default => unsafe {
+                ffi::rive_rs_instantiate_state_machine(
+                    artboard.as_inner().raw_artboard,
+                    None,
+                    &mut raw_state_machine,
+                )
+            },
+            Handle::Index(ref index) => unsafe {
+                ffi::rive_rs_instantiate_state_machine(
+                    artboard.as_inner().raw_artboard,
+                    Some(index.into()),
+                    &mut raw_state_machine,
+                )
+            },
+            Handle::Name(name) => unsafe {
+                ffi::rive_rs_instantiate_state_machine_by_name(
+                    artboard.as_inner().raw_artboard,
+                    name.as_ptr(),
+                    name.len(),
+                    &mut raw_state_machine,
+                )
+            },
         }
 
         raw_state_machine.map(|raw_state_machine| StateMachine {

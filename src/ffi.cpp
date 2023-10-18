@@ -402,7 +402,21 @@ extern "C"
             }
         }
 
-        if (*artboard_instance) {
+        if (*artboard_instance)
+        {
+            (*artboard_instance)->advance(0.0f);
+        }
+    }
+
+    void rive_rs_instantiate_artboard_by_name(const File* file,
+                                              const char* data,
+                                              size_t len,
+                                              ArtboardInstance** artboard_instance)
+    {
+        *artboard_instance = file->artboardNamed({data, len}).release();
+
+        if (*artboard_instance)
+        {
             (*artboard_instance)->advance(0.0f);
         }
     }
@@ -434,18 +448,26 @@ extern "C"
         }
     }
 
+    void rive_rs_instantiate_linear_animation_by_name(ArtboardInstance* artboard_instance,
+                                                      const char* data,
+                                                      size_t len,
+                                                      LinearAnimationInstance** linear_animation)
+    {
+        *linear_animation = artboard_instance->animationNamed({data, len}).release();
+    }
+
     float rive_rs_linear_animation_time(const LinearAnimationInstance* linear_animation)
     {
         return linear_animation->time();
     }
 
-    void rive_rs_linear_animation_set_time(LinearAnimationInstance* linear_animation,
-                                           float time)
+    void rive_rs_linear_animation_set_time(LinearAnimationInstance* linear_animation, float time)
     {
         linear_animation->time(time);
     }
 
-    bool rive_rs_linear_animation_is_forwards(const LinearAnimationInstance* linear_animation) {
+    bool rive_rs_linear_animation_is_forwards(const LinearAnimationInstance* linear_animation)
+    {
         return linear_animation->direction() == 1;
     }
 
@@ -455,14 +477,12 @@ extern "C"
         linear_animation->direction(is_forwards ? 1 : -1);
     }
 
-    bool rive_rs_linear_animation_advance(LinearAnimationInstance* linear_animation,
-                                          float elapsed)
+    bool rive_rs_linear_animation_advance(LinearAnimationInstance* linear_animation, float elapsed)
     {
         return linear_animation->advance(elapsed);
     }
 
-    void rive_rs_linear_animation_apply(const LinearAnimationInstance* linear_animation,
-                                        float mix)
+    void rive_rs_linear_animation_apply(const LinearAnimationInstance* linear_animation, float mix)
     {
         linear_animation->apply(mix);
     }
@@ -472,8 +492,7 @@ extern "C"
         return linear_animation->didLoop();
     }
 
-    void rive_rs_linear_animation_set_loop(LinearAnimationInstance* linear_animation,
-                                           Loop loop)
+    void rive_rs_linear_animation_set_loop(LinearAnimationInstance* linear_animation, Loop loop)
     {
         linear_animation->loopValue(static_cast<int>(loop));
     }
@@ -501,11 +520,20 @@ extern "C"
             if (ptr)
             {
                 *state_machine = ptr.release();
-            } else if (artboard_instance->stateMachineCount())
+            }
+            else if (artboard_instance->stateMachineCount())
             {
                 *state_machine = artboard_instance->stateMachineAt(0).release();
             }
         }
+    }
+
+    void rive_rs_instantiate_state_machine_by_name(ArtboardInstance* artboard_instance,
+                                                   const char* data,
+                                                   size_t len,
+                                                   StateMachineInstance** state_machine)
+    {
+        *state_machine = artboard_instance->stateMachineNamed({data, len}).release();
     }
 
     void rive_rs_state_machine_get_event(const StateMachineInstance* state_machine_instance,

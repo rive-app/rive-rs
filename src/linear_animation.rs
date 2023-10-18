@@ -4,7 +4,7 @@ use core::{fmt, marker::PhantomData, ptr::NonNull, time::Duration};
 use crate::{
     artboard::{Artboard, ArtboardInner},
     ffi,
-    instantiate::Instantiate,
+    instantiate::{Handle, Instantiate},
     renderer::Renderer,
     scene::impl_scene,
 };
@@ -37,15 +37,32 @@ impl<R: Renderer> Instantiate for LinearAnimation<R> {
     type From = Artboard<R>;
 
     #[inline]
-    fn instantiate(artboard: &Self::From, index: Option<usize>) -> Option<Self> {
+    fn instantiate(artboard: &Self::From, handle: Handle) -> Option<Self> {
         let mut raw_linear_animation: Option<NonNull<ffi::LinearAnimation>> = None;
 
-        unsafe {
-            ffi::rive_rs_instantiate_linear_animation(
-                artboard.as_inner().raw_artboard,
-                index.as_ref().map(|val| val.into()),
-                &mut raw_linear_animation,
-            );
+        match handle {
+            Handle::Default => unsafe {
+                ffi::rive_rs_instantiate_linear_animation(
+                    artboard.as_inner().raw_artboard,
+                    None,
+                    &mut raw_linear_animation,
+                )
+            },
+            Handle::Index(ref index) => unsafe {
+                ffi::rive_rs_instantiate_linear_animation(
+                    artboard.as_inner().raw_artboard,
+                    Some(index.into()),
+                    &mut raw_linear_animation,
+                )
+            },
+            Handle::Name(name) => unsafe {
+                ffi::rive_rs_instantiate_linear_animation_by_name(
+                    artboard.as_inner().raw_artboard,
+                    name.as_ptr(),
+                    name.len(),
+                    &mut raw_linear_animation,
+                )
+            },
         }
 
         raw_linear_animation.map(|raw_linear_animation| LinearAnimation {

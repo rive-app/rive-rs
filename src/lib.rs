@@ -17,7 +17,7 @@ pub mod vello;
 
 pub use crate::{
     file::Error,
-    instantiate::Instantiate,
+    instantiate::{Handle, Instantiate},
     linear_animation::{Direction, Loop},
     scene::Viewport,
 };
@@ -48,11 +48,11 @@ impl<T: scene::Scene<crate::vello::Renderer>> Scene for T {}
 impl Instantiate for Box<dyn Scene> {
     type From = Artboard;
 
-    fn instantiate(from: &Self::From, index: Option<usize>) -> Option<Self> {
-        StateMachine::instantiate(from, index)
+    fn instantiate(from: &Self::From, handle: Handle) -> Option<Self> {
+        StateMachine::instantiate(from, handle.clone())
             .map(|sm| Box::new(sm) as Box<dyn Scene>)
             .or_else(|| {
-                LinearAnimation::instantiate(from, index).map(|la| Box::new(la) as Box<dyn Scene>)
+                LinearAnimation::instantiate(from, handle).map(|la| Box::new(la) as Box<dyn Scene>)
             })
     }
 }

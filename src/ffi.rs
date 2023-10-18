@@ -490,10 +490,22 @@ extern "C" {
         index: Option<NonNull<usize>>,
         artboard: *mut Option<NonNull<Artboard>>,
     );
+    pub fn rive_rs_instantiate_artboard_by_name(
+        file: *const File,
+        data: *const u8,
+        len: usize,
+        raw_artboard: *mut Option<NonNull<Artboard>>,
+    );
     pub fn rive_rs_artboard_instance_release(artboard_instance: *mut Artboard);
     pub fn rive_rs_instantiate_linear_animation(
         artboard: *mut Artboard,
         index: Option<NonNull<usize>>,
+        linear_animation: *mut Option<NonNull<LinearAnimation>>,
+    );
+    pub fn rive_rs_instantiate_linear_animation_by_name(
+        artboard: *mut Artboard,
+        data: *const u8,
+        len: usize,
         linear_animation: *mut Option<NonNull<LinearAnimation>>,
     );
     pub fn rive_rs_linear_animation_time(linear_animation: *mut LinearAnimation) -> f32;
@@ -514,6 +526,12 @@ extern "C" {
     pub fn rive_rs_instantiate_state_machine(
         artboard: *mut Artboard,
         index: Option<NonNull<usize>>,
+        state_machine: *mut Option<NonNull<StateMachine>>,
+    );
+    pub fn rive_rs_instantiate_state_machine_by_name(
+        artboard: *mut Artboard,
+        data: *const u8,
+        len: usize,
         state_machine: *mut Option<NonNull<StateMachine>>,
     );
     pub fn rive_rs_state_machine_get_event(

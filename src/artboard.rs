@@ -4,7 +4,7 @@ use core::{fmt, marker::PhantomData, ptr::NonNull};
 use crate::{
     ffi,
     file::{File, FileInner},
-    instantiate::Instantiate,
+    instantiate::{Handle, Instantiate},
     renderer::Renderer,
 };
 
@@ -40,15 +40,28 @@ impl<R: Renderer> Instantiate for Artboard<R> {
     type From = File<R>;
 
     #[inline]
-    fn instantiate(file: &Self::From, index: Option<usize>) -> Option<Self> {
+    fn instantiate(file: &Self::From, handle: Handle) -> Option<Self> {
         let mut raw_artboard: Option<NonNull<ffi::Artboard>> = None;
 
-        unsafe {
-            ffi::rive_rs_instantiate_artboard(
-                file.as_inner().raw_file,
-                index.as_ref().map(|val| val.into()),
-                &mut raw_artboard,
-            );
+        match handle {
+            Handle::Default => unsafe {
+                ffi::rive_rs_instantiate_artboard(file.as_inner().raw_file, None, &mut raw_artboard)
+            },
+            Handle::Index(ref index) => unsafe {
+                ffi::rive_rs_instantiate_artboard(
+                    file.as_inner().raw_file,
+                    Some(index.into()),
+                    &mut raw_artboard,
+                )
+            },
+            Handle::Name(name) => unsafe {
+                ffi::rive_rs_instantiate_artboard_by_name(
+                    file.as_inner().raw_file,
+                    name.as_ptr(),
+                    name.len(),
+                    &mut raw_artboard,
+                )
+            },
         }
 
         raw_artboard.map(|raw_artboard| Artboard {
