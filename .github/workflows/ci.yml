@@ -1,0 +1,91 @@
+name: Continuous integration
+
+on:
+  push:
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo check --all --no-default-features
+      - run: cargo check --all --all-features
+
+  build-clang:
+    name: Build (clang)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Install clang
+        run: |
+          sudo apt update
+          sudo apt install clang
+      - run: CC="clang" CXX="clang++" cargo build --all --no-default-features
+      - run: CC="clang" CXX="clang++" cargo build --all --all-features
+
+  build-gcc:
+    name: Build (GCC)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+      - uses: Swatinem/rust-cache@v2
+      - run: CC="gcc" CXX="g++" cargo build --all --no-default-features
+      - run: CC="gcc" CXX="g++" cargo build --all --all-features
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Install clang
+        run: |
+          sudo apt update
+          sudo apt install clang
+      - run: cargo test --all --no-default-features
+      - run: cargo test --all --all-features
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@1.72.0
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Install clang
+        run: |
+          sudo apt update
+          sudo apt install clang
+      - run: cargo clippy --all --no-default-features -- -D warnings
+      - run: cargo clippy --all --all-features -- -D warnings
