@@ -1,20 +1,6 @@
-[package]
-name = "rive-rs"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["rive-rs", "examples/*"]
+resolver = "2"
 
-[features]
-default = ["text"]
-text = []
-vello = ["dep:bytemuck", "dep:image", "dep:smallvec", "dep:vello"]
-
-[build-dependencies]
-cc = { version = "1.0.83", features = ["parallel"] }
-walkdir = "2.4.0"
-
-[dependencies]
-bitflags = "2.4.0"
-bytemuck = { version = "1.14.0", optional = true }
-image = { version = "0.24.6", optional = true }
-smallvec = { version = "1.8.0", optional = true }
-vello = { git = "https://github.com/linebender/vello", rev = "ee3a076", optional = true }
+[workspace.dependencies]
+vello = { git = "https://github.com/linebender/vello", rev = "ee3a076" }

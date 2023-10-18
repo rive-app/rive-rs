@@ -23,7 +23,7 @@ fn main() {
 
     let rive_cpp_path = env::var("RIVE_CPP_PATH")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| PathBuf::from("submodules/rive-cpp"));
+        .unwrap_or_else(|_| PathBuf::from("../submodules/rive-cpp"));
 
     cc::Build::new()
         .cpp(true)
@@ -41,7 +41,7 @@ fn main() {
         cfg.cpp(true)
             .flag_if_supported("-std=c++11") // for unix
             .warnings(false)
-            .file("submodules/harfbuzz/src/harfbuzz.cc");
+            .file("../submodules/harfbuzz/src/harfbuzz.cc");
 
         if !target.contains("windows") {
             cfg.define("HAVE_PTHREAD", "1");
@@ -62,8 +62,11 @@ fn main() {
         cfg.compile("harfbuzz");
 
         cc::Build::new()
-            .files(all_files_with_extension("submodules/SheenBidi/Source", "c"))
-            .include("submodules/SheenBidi/Headers")
+            .files(all_files_with_extension(
+                "../submodules/SheenBidi/Source",
+                "c",
+            ))
+            .include("../submodules/SheenBidi/Headers")
             .warnings(false)
             .compile("sheenbidi");
     }
@@ -76,8 +79,8 @@ fn main() {
         .warnings(false);
 
     if cfg!(feature = "text") {
-        cfg.include("submodules/harfbuzz/src")
-            .include("submodules/SheenBidi/Headers")
+        cfg.include("../submodules/harfbuzz/src")
+            .include("../submodules/SheenBidi/Headers")
             .flag_if_supported("-Wno-deprecated-declarations")
             .define("WITH_RIVE_TEXT", None);
     }
