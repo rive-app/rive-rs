@@ -51,6 +51,12 @@ pub enum File {}
 pub enum Artboard {}
 
 #[derive(Clone, Copy)]
+pub enum Component {}
+
+#[derive(Clone, Copy)]
+pub enum TextValueRun {}
+
+#[derive(Clone, Copy)]
 pub enum LinearAnimation {}
 
 #[derive(Clone, Copy)]
@@ -497,6 +503,27 @@ extern "C" {
         raw_artboard: *mut Option<NonNull<Artboard>>,
     );
     pub fn rive_rs_artboard_instance_release(artboard_instance: *mut Artboard);
+    pub fn rive_rs_artboard_component_count(artboard_instance: *mut Artboard) -> usize;
+    pub fn rive_rs_artboard_get_component(
+        artboard_instance: *mut Artboard,
+        index: usize,
+    ) -> *mut Component;
+    pub fn rive_rs_component_type_id(component: *const Component) -> u16;
+    pub fn rive_rs_component_name(
+        component: *const Component,
+        data: *mut *const u8,
+        len: *mut usize,
+    );
+    pub fn rive_rs_text_value_run_get_text(
+        text_value_run: *const TextValueRun,
+        data: *mut *const u8,
+        len: *mut usize,
+    );
+    pub fn rive_rs_text_value_run_set_text(
+        text_value_run: *mut TextValueRun,
+        data: *const u8,
+        len: usize,
+    );
     pub fn rive_rs_instantiate_linear_animation(
         artboard: *mut Artboard,
         index: Option<NonNull<usize>>,
@@ -570,8 +597,7 @@ extern "C" {
         name: *const u8,
         len: usize,
     ) -> *mut Trigger;
-    #[allow(improper_ctypes)]
-    pub fn rive_rs_input_name(input: *mut Input, string: *mut String);
+    pub fn rive_rs_input_name(input: *mut Input, data: *mut *const u8, len: *mut usize);
     pub fn rive_rs_bool_get(bool: *mut Bool) -> bool;
     pub fn rive_rs_bool_set(bool: *mut Bool, val: bool);
     pub fn rive_rs_number_get(number: *mut Number) -> f32;
@@ -588,8 +614,6 @@ extern "C" {
     pub fn rive_rs_commands_next(commands: *mut Commands) -> Command;
     pub fn rive_rs_scene_width(scene: *mut Scene) -> f32;
     pub fn rive_rs_scene_height(scene: *mut Scene) -> f32;
-    #[allow(improper_ctypes)]
-    pub fn rive_rs_scene_name(scene: *mut Scene, string: *mut String);
     pub fn rive_rs_scene_loop(scene: *mut Scene) -> Loop;
     pub fn rive_rs_scene_is_translucent(scene: *mut Scene) -> bool;
     pub fn rive_rs_scene_duration(scene: *mut Scene) -> f32;

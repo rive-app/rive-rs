@@ -9,7 +9,7 @@ pub trait Raw: Copy {
     unsafe fn get<'r>(self, index: usize) -> Self::Item<'r>;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct RawIter<'r, R: Raw> {
     raw: R,
     start: usize,
@@ -67,7 +67,7 @@ macro_rules! impl_iter {
     ( @raw_iter_type $raw:ty ) => (crate::raw_iter::RawIter<'static, $raw>);
 
     ( $iter:ident, $item:ident, $raw:ty $( , $lt:lifetime )? ) => {
-        #[derive(Clone, Debug)]
+        #[derive(Debug)]
         pub struct $iter$(<$lt>)?(impl_iter!(@raw_iter_type $raw $(, $lt)?));
 
         impl$(<$lt>)? $iter$(<$lt>)? {

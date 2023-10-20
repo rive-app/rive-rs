@@ -1,6 +1,6 @@
 use core::time::Duration;
 
-use alloc::{boxed::Box, string::String};
+use alloc::boxed::Box;
 
 use crate::{
     artboard::Artboard,
@@ -53,7 +53,7 @@ impl Default for Viewport {
 pub trait Scene<R: Renderer>: Send + Sync {
     fn width(&self) -> f32;
     fn height(&self) -> f32;
-    fn name(&self) -> String;
+    fn name(&self) -> &str;
     fn r#loop(&self) -> Loop;
     fn is_translucent(&self) -> bool;
     fn duration(&self) -> Option<Duration>;
@@ -89,17 +89,20 @@ macro_rules! impl_scene {
             }
 
             #[inline]
-            fn name(&self) -> ::alloc::string::String {
-                let mut name = ::alloc::string::String::new();
+            fn name(&self) -> &str {
+                let mut data = core::ptr::null();
+                let mut len = 0;
 
-                unsafe {
-                    crate::ffi::rive_rs_scene_name(
-                        self.raw_scene(),
-                        &mut name as *mut ::alloc::string::String,
+                let bytes = unsafe {
+                    crate::ffi::rive_rs_component_name(
+                        self.raw_scene() as *mut crate::ffi::Component,
+                        &mut data as *mut *const u8,
+                        &mut len as *mut usize,
                     );
-                }
+                    core::slice::from_raw_parts(data, len)
+                };
 
-                name
+                core::str::from_utf8(bytes).expect("scene name is invalid UTF-8")
             }
 
             #[inline]

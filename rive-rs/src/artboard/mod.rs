@@ -8,6 +8,10 @@ use crate::{
     renderer::Renderer,
 };
 
+use self::components::Components;
+
+pub mod components;
+
 #[derive(Debug)]
 pub(crate) struct ArtboardInner {
     _file: Arc<FileInner>,
@@ -33,6 +37,11 @@ pub struct Artboard<R: Renderer> {
 impl<R: Renderer> Artboard<R> {
     pub(crate) fn as_inner(&self) -> &Arc<ArtboardInner> {
         &self.inner
+    }
+
+    #[inline]
+    pub fn components(&mut self) -> Components {
+        Components::new(components::RawArtboard(self.inner.raw_artboard))
     }
 }
 

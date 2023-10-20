@@ -9,12 +9,12 @@ use crate::{
     scene::impl_scene,
 };
 
-mod event;
-mod input;
+mod events;
+mod inputs;
 
 pub use self::{
-    event::{Event, EventIter, Property},
-    input::{Bool, InputIter, Number, Trigger},
+    events::{Event, EventIter, Property},
+    inputs::{Bool, InputIter, Number, Trigger},
 };
 
 pub struct StateMachine<R: Renderer> {
@@ -74,12 +74,12 @@ impl<R: Renderer> StateMachine<R> {
 
     #[inline]
     pub fn events(&self) -> EventIter {
-        EventIter::new(event::RawStateMachine(self.raw_state_machine))
+        EventIter::new(events::RawStateMachine(self.raw_state_machine))
     }
 
     #[inline]
     pub fn inputs(&self) -> InputIter {
-        InputIter::new(input::RawStateMachine(self.raw_state_machine))
+        InputIter::new(inputs::RawStateMachine(self.raw_state_machine))
     }
 
     #[inline]

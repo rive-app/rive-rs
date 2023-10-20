@@ -16,6 +16,7 @@ pub mod state_machine;
 pub mod vello;
 
 pub use crate::{
+    artboard::components,
     file::Error,
     instantiate::{Handle, Instantiate},
     linear_animation::{Direction, Loop},

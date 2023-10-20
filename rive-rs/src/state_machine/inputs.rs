@@ -1,12 +1,26 @@
-use alloc::string::String;
-use core::{fmt, marker::PhantomData, ptr};
+use core::{fmt, marker::PhantomData, ptr, slice, str};
 
 use crate::{
     ffi,
     raw_iter::{impl_iter, Raw},
 };
 
-#[derive(Clone, Copy)]
+unsafe fn input_name<'s>(raw_input: *mut ffi::Input) -> &'s str {
+    let mut data = ptr::null();
+    let mut len = 0;
+
+    let bytes = unsafe {
+        ffi::rive_rs_input_name(
+            raw_input,
+            &mut data as *mut *const u8,
+            &mut len as *mut usize,
+        );
+        slice::from_raw_parts(data, len)
+    };
+
+    str::from_utf8(bytes).expect("input name is invalid UTF-8")
+}
+
 pub struct Bool<'s> {
     raw_bool: *mut ffi::Bool,
     _phantom: PhantomData<&'s ()>,
@@ -20,14 +34,8 @@ impl Bool<'_> {
         }
     }
 
-    pub fn name(&self) -> String {
-        let mut name = String::new();
-
-        unsafe {
-            ffi::rive_rs_input_name(self.raw_bool as *mut ffi::Input, &mut name as *mut String);
-        }
-
-        name
+    pub fn name(&self) -> &str {
+        unsafe { input_name(self.raw_bool as *mut ffi::Input) }
     }
 
     pub fn get(&self) -> bool {
@@ -47,7 +55,6 @@ impl<'s> fmt::Debug for Bool<'s> {
     }
 }
 
-#[derive(Clone, Copy)]
 pub struct Number<'s> {
     raw_number: *mut ffi::Number,
     _phantom: PhantomData<&'s ()>,
@@ -61,14 +68,8 @@ impl Number<'_> {
         }
     }
 
-    pub fn name(&self) -> String {
-        let mut name = String::new();
-
-        unsafe {
-            ffi::rive_rs_input_name(self.raw_number as *mut ffi::Input, &mut name as *mut String);
-        }
-
-        name
+    pub fn name(&self) -> &str {
+        unsafe { input_name(self.raw_number as *mut ffi::Input) }
     }
 
     pub fn get(&self) -> f32 {
@@ -90,7 +91,6 @@ impl<'s> fmt::Debug for Number<'s> {
     }
 }
 
-#[derive(Clone, Copy)]
 pub struct Trigger<'s> {
     raw_trigger: *mut ffi::Trigger,
     _phantom: PhantomData<&'s ()>,
@@ -104,17 +104,8 @@ impl Trigger<'_> {
         }
     }
 
-    pub fn name(&self) -> String {
-        let mut name = String::new();
-
-        unsafe {
-            ffi::rive_rs_input_name(
-                self.raw_trigger as *mut ffi::Input,
-                &mut name as *mut String,
-            );
-        }
-
-        name
+    pub fn name(&self) -> &str {
+        unsafe { input_name(self.raw_trigger as *mut ffi::Input) }
     }
 
     pub fn fire(&mut self) {
@@ -132,7 +123,7 @@ impl<'s> fmt::Debug for Trigger<'s> {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug)]
 pub enum Input<'s> {
     Bool(Bool<'s>),
     Number(Number<'s>),

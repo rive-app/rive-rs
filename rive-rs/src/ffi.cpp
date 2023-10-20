@@ -427,6 +427,49 @@ extern "C"
             std::move(const_cast<ArtboardInstance*>(artboard_instance)));
     }
 
+    size_t rive_rs_artboard_component_count(const ArtboardInstance* artboard_instance)
+    {
+        return artboard_instance->objects().size();
+    }
+
+    const Core* rive_rs_artboard_get_component(const ArtboardInstance* artboard_instance,
+                                               size_t index)
+    {
+        return artboard_instance->objects()[index];
+    }
+
+    uint16_t rive_rs_component_type_id(const Core* component)
+    {
+        return component->coreType();
+    }
+
+    void rive_rs_component_name(const Component* component,
+                                const char** data,
+                                size_t* len)
+    {
+        if (static_cast<const Core*>(component)->is<Component>()) {
+            *data = component->name().data();
+            *len = component->name().size();
+        } else {
+            *len = 0;
+        }
+    }
+
+    void rive_rs_text_value_run_get_text(const TextValueRun* text_value_run,
+                                         const char** data,
+                                         size_t* len)
+    {
+        *data = text_value_run->text().data();
+        *len = text_value_run->text().size();
+    }
+
+    void rive_rs_text_value_run_set_text(TextValueRun* text_value_run,
+                                         const char* data,
+                                         size_t len)
+    {
+        text_value_run->text({data, len});
+    }
+
     void rive_rs_instantiate_linear_animation(ArtboardInstance* artboard_instance,
                                               const size_t* index,
                                               LinearAnimationInstance** linear_animation)
@@ -658,9 +701,12 @@ extern "C"
         return state_machine_instance->getTrigger({name, len});
     }
 
-    void rive_rs_input_name(const SMIInput* input, const RawRustString* string)
+    void rive_rs_input_name(const SMIInput* input,
+                            const char** data,
+                            size_t* len)
     {
-        rive_rs_allocate_string(string, input->name().data(), input->name().size());
+        *data = input->name().data();
+        *len = input->name().size();
     }
 
     bool rive_rs_bool_get(const SMIBool* bool_) { return bool_->value(); }
@@ -688,11 +734,6 @@ extern "C"
     float rive_rs_scene_width(const Scene* scene) { return scene->width(); }
 
     float rive_rs_scene_height(const Scene* scene) { return scene->height(); }
-
-    void rive_rs_scene_name(const Scene* scene, const RawRustString* string)
-    {
-        rive_rs_allocate_string(string, scene->name().data(), scene->name().size());
-    }
 
     Loop rive_rs_scene_loop(const Scene* scene) { return scene->loop(); }
 
