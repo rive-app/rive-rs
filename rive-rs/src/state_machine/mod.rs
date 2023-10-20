@@ -68,6 +68,10 @@ impl<R: Renderer> StateMachine<R> {
         self.artboard.raw_artboard
     }
 
+    pub fn artboart(&self) -> Artboard<R> {
+        Artboard::from_inner(self.artboard.clone())
+    }
+
     fn raw_scene(&self) -> *mut ffi::Scene {
         self.raw_state_machine as *mut ffi::Scene
     }

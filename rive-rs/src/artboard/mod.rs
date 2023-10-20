@@ -35,6 +35,13 @@ pub struct Artboard<R: Renderer> {
 }
 
 impl<R: Renderer> Artboard<R> {
+    pub(crate) fn from_inner(inner: Arc<ArtboardInner>) -> Self {
+        Self {
+            inner,
+            _phantom: PhantomData,
+        }
+    }
+
     pub(crate) fn as_inner(&self) -> &Arc<ArtboardInner> {
         &self.inner
     }

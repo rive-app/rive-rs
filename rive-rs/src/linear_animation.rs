@@ -78,6 +78,10 @@ impl<R: Renderer> LinearAnimation<R> {
         self.artboard.raw_artboard
     }
 
+    pub fn artboart(&self) -> Artboard<R> {
+        Artboard::from_inner(self.artboard.clone())
+    }
+
     fn raw_scene(&self) -> *mut ffi::Scene {
         self.raw_linear_animation as *mut ffi::Scene
     }
