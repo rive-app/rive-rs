@@ -439,19 +439,17 @@ extern "C"
         return artboard_instance->objects()[index];
     }
 
-    uint16_t rive_rs_component_type_id(const Core* component)
-    {
-        return component->coreType();
-    }
+    uint16_t rive_rs_component_type_id(const Core* component) { return component->coreType(); }
 
-    void rive_rs_component_name(const Component* component,
-                                const char** data,
-                                size_t* len)
+    void rive_rs_component_name(const Component* component, const char** data, size_t* len)
     {
-        if (static_cast<const Core*>(component)->is<Component>()) {
+        if (static_cast<const Core*>(component)->is<Component>())
+        {
             *data = component->name().data();
             *len = component->name().size();
-        } else {
+        }
+        else
+        {
             *len = 0;
         }
     }
@@ -464,9 +462,7 @@ extern "C"
         *len = text_value_run->text().size();
     }
 
-    void rive_rs_text_value_run_set_text(TextValueRun* text_value_run,
-                                         const char* data,
-                                         size_t len)
+    void rive_rs_text_value_run_set_text(TextValueRun* text_value_run, const char* data, size_t len)
     {
         text_value_run->text({data, len});
     }
@@ -702,9 +698,7 @@ extern "C"
         return state_machine_instance->getTrigger({name, len});
     }
 
-    void rive_rs_input_name(const SMIInput* input,
-                            const char** data,
-                            size_t* len)
+    void rive_rs_input_name(const SMIInput* input, const char** data, size_t* len)
     {
         *data = input->name().data();
         *len = input->name().size();
