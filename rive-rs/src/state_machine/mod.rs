@@ -68,7 +68,7 @@ impl<R: Renderer> StateMachine<R> {
         self.artboard.raw_artboard
     }
 
-    pub fn artboart(&self) -> Artboard<R> {
+    pub fn artboard(&self) -> Artboard<R> {
         Artboard::from_inner(self.artboard.clone())
     }
 
