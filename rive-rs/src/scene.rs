@@ -1,4 +1,4 @@
-use core::time::Duration;
+use core::{any::Any, time::Duration};
 
 use alloc::boxed::Box;
 
@@ -68,7 +68,7 @@ pub trait Scene<R: Renderer>: Send + Sync {
         elapsed: Duration,
         viewport: &mut Viewport,
     ) -> bool;
-    fn as_any(&self) -> &dyn ::core::any::Any;
+    fn as_any(&self) -> &dyn Any;
 }
 
 macro_rules! impl_scene {
@@ -90,7 +90,7 @@ macro_rules! impl_scene {
 
             #[inline]
             fn name(&self) -> &str {
-                let mut data = core::ptr::null();
+                let mut data = ::core::ptr::null();
                 let mut len = 0;
 
                 let bytes = unsafe {
@@ -99,10 +99,10 @@ macro_rules! impl_scene {
                         &mut data as *mut *const u8,
                         &mut len as *mut usize,
                     );
-                    core::slice::from_raw_parts(data, len)
+                    ::core::slice::from_raw_parts(data, len)
                 };
 
-                core::str::from_utf8(bytes).expect("scene name is invalid UTF-8")
+                ::core::str::from_utf8(bytes).expect("scene name is invalid UTF-8")
             }
 
             #[inline]

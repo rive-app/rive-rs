@@ -63,8 +63,8 @@ macro_rules! try_from_component {
                 unsafe {
                     (crate::ffi::rive_rs_component_type_id(value.raw_component) == $type_id)
                         .then(|| Self {
-                            $raw_name: value.raw_component as *mut ffi::$component,
-                            _phantom: core::marker::PhantomData,
+                            $raw_name: value.raw_component as *mut crate::ffi::$component,
+                            _phantom: ::core::marker::PhantomData,
                         })
                         .ok_or(())
                 }
