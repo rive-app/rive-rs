@@ -15,6 +15,7 @@
 #include "rive/math/raw_path.hpp"
 #include "rive/math/vec2d.hpp"
 #include "rive/renderer.hpp"
+#include "rive/text/text_value_run.hpp"
 
 extern "C"
 {
