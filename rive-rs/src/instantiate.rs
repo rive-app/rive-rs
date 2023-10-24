@@ -1,11 +1,11 @@
-use alloc::{borrow::Cow, string::String};
+use alloc::borrow::Cow;
 
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub enum Handle {
     #[default]
     Default,
     Index(usize),
-    Name(Cow<'static, String>),
+    Name(Cow<'static, str>),
 }
 
 pub trait Instantiate: Sized {
