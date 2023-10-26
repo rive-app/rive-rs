@@ -287,11 +287,10 @@ extern "C"
             return std::make_unique<RustPaint>(m_entries->paint_default(), m_entries);
         }
 
-        std::unique_ptr<RenderImage> decodeImage(Span<const uint8_t> encoded) override
+        rcp<RenderImage> decodeImage(Span<const uint8_t> encoded) override
         {
-            return std::make_unique<RustImage>(
-                m_entries->image_decode(encoded.data(), encoded.size()),
-                m_entries);
+            return make_rcp<RustImage>(m_entries->image_decode(encoded.data(), encoded.size()),
+                                       m_entries);
         }
     };
 
