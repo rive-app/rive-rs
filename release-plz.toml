@@ -1,0 +1,8 @@
+[workspace]
+changelog_config = "cliff.toml"
+changelog_update = false
+
+[[package]]
+name = "rive-rs"
+changelog_update = true
+changelog_path = "./CHANGELOG.md"
