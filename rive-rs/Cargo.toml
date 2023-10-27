@@ -1,7 +1,16 @@
 [package]
 name = "rive-rs"
+description = "Rive runtime bindings"
 version = "0.1.0"
 edition = "2021"
+authors = ["Dragoș Tiselice <dragos@rive.app>"]
+homepage = "https://rive.app/"
+repository = "https://github.com/rive-app/rive-rs"
+documentation = "https://docs.rs/rive-rs"
+keywords = ["rive", "runtime", "animation", "state-machine"]
+categories = ["multimedia"]
+license = "MIT"
+readme = "../README.md"
 
 [features]
 default = ["text"]

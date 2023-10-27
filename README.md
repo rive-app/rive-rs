@@ -1,6 +1,4 @@
 ![CI](https://github.com/rive-app/rive-rs/actions/workflows/ci.yml/badge.svg)
-[![crates.io](https://img.shields.io/crates/v/rive-rs.svg)](https://crates.io/crates/rive-rs)
-[![docs.rs](https://img.shields.io/docsrs/rive-rs)](https://docs.rs/rive-rs)
 ![Discord badge](https://img.shields.io/discord/532365473602600965)
 ![Twitter handle](https://img.shields.io/twitter/follow/rive_app.svg?style=social&label=Follow)
 
