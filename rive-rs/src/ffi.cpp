@@ -604,34 +604,46 @@ extern "C"
                 case CustomPropertyBoolean::typeKey:
                 {
                     auto boolean = static_cast<CustomPropertyBoolean*>(child);
+
+                    Property property;
+                    property.boolean = boolean->propertyValue();
+
                     rive_rs_insert_property(properties,
                                             child->name().data(),
                                             child->name().size(),
                                             PropertyTag::Bool,
-                                            {.boolean = boolean->propertyValue()});
+                                            property);
 
                     break;
                 }
                 case CustomPropertyNumber::typeKey:
                 {
                     auto number = static_cast<CustomPropertyNumber*>(child);
+
+                    Property property;
+                    property.number = number->propertyValue();
+
                     rive_rs_insert_property(properties,
                                             child->name().data(),
                                             child->name().size(),
                                             PropertyTag::Number,
-                                            {.number = number->propertyValue()});
+                                            property);
 
                     break;
                 }
                 case CustomPropertyString::typeKey:
                 {
                     auto string = static_cast<CustomPropertyString*>(child);
+
+                    Property property;
+                    property.string = {string->propertyValue().data(),
+                                       string->propertyValue().size()};
+
                     rive_rs_insert_property(properties,
                                             child->name().data(),
                                             child->name().size(),
                                             PropertyTag::String,
-                                            {.string = {.data = string->propertyValue().data(),
-                                                        .len = string->propertyValue().size()}});
+                                            property);
 
                     break;
                 }
