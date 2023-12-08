@@ -110,7 +110,7 @@ extern "C"
                                          float);
     } RendererEntries;
 
-    class RustBuffer : public RenderBuffer
+    class RustBuffer : public lite_rtti_override<RenderBuffer, RustBuffer>
     {
     private:
         const RawRustBuffer* m_buffer;
@@ -121,7 +121,7 @@ extern "C"
                    RenderBufferFlags flags,
                    size_t sizeInBytes,
                    const RendererEntries* entries) :
-            RenderBuffer(type, flags, sizeInBytes),
+            lite_rtti_override(type, flags, sizeInBytes),
             m_buffer(entries->buffer_new(type, flags, sizeInBytes)),
             m_entries(entries)
         {}
@@ -133,7 +133,7 @@ extern "C"
         void onUnmap() override { m_entries->buffer_unmap(m_buffer); }
     };
 
-    class RustShader : public RenderShader
+    class RustShader : public lite_rtti_override<RenderShader, RustShader>
     {
     private:
         const RawRustGradient* m_gradient;
@@ -148,7 +148,7 @@ extern "C"
         const RawRustGradient* gradient() const { return m_gradient; }
     };
 
-    class RustImage : public RenderImage
+    class RustImage : public lite_rtti_override<RenderImage, RustImage>
     {
     private:
         const RawRustImage* m_image;
@@ -163,7 +163,7 @@ extern "C"
         const RawRustImage* image() const { return m_image; }
     };
 
-    class RustPath : public RenderPath
+    class RustPath : public lite_rtti_override<RenderPath, RustPath>
     {
     private:
         const RawRustPath* m_path;
@@ -180,9 +180,8 @@ extern "C"
         void rewind() override { m_entries->path_reset(m_path); }
         void addRenderPath(RenderPath* path, const Mat2D& transform) override
         {
-            m_entries->path_extend(m_path,
-                                   static_cast<RustPath*>(path)->m_path,
-                                   transform.values());
+            LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
+            m_entries->path_extend(m_path, rustPath->m_path, transform.values());
         }
         void fillRule(FillRule value) override { m_entries->path_set_fill_rule(m_path, value); }
         void moveTo(float x, float y) override { m_entries->path_move_to(m_path, x, y); }
@@ -194,7 +193,7 @@ extern "C"
         virtual void close() override { m_entries->path_close(m_path); }
     };
 
-    class RustPaint : public RenderPaint
+    class RustPaint : public lite_rtti_override<RenderPaint, RustPaint>
     {
     private:
         const RawRustPaint* m_paint;
@@ -219,11 +218,11 @@ extern "C"
         }
         void shader(rcp<RenderShader> shader) override
         {
-            auto ptr = shader.get();
+            auto rustShader = lite_rtti_cast<RustShader*>(shader.get());
 
-            if (ptr)
+            if (rustShader)
             {
-                m_entries->paint_set_gradient(m_paint, static_cast<RustShader*>(ptr)->gradient());
+                m_entries->paint_set_gradient(m_paint, rustShader->gradient());
             }
         }
         void invalidateStroke() override { m_entries->paint_invalidate_stroke(m_paint); }
@@ -314,20 +313,19 @@ extern "C"
         }
         void clipPath(RenderPath* path) override
         {
-            m_entries->renderer_set_clip(m_renderer, static_cast<RustPath*>(path)->path());
+            LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
+            m_entries->renderer_set_clip(m_renderer, rustPath->path());
         }
         void drawPath(RenderPath* path, RenderPaint* paint) override
         {
-            m_entries->renderer_draw_path(m_renderer,
-                                          static_cast<RustPath*>(path)->path(),
-                                          static_cast<RustPaint*>(paint)->paint());
+            LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
+            LITE_RTTI_CAST_OR_RETURN(rustPaint, RustPaint*, paint);
+            m_entries->renderer_draw_path(m_renderer, rustPath->path(), rustPaint->paint());
         }
         void drawImage(const RenderImage* image, BlendMode blend_mode, float opacity) override
         {
-            m_entries->renderer_draw_image(m_renderer,
-                                           static_cast<const RustImage*>(image)->image(),
-                                           blend_mode,
-                                           opacity);
+            LITE_RTTI_CAST_OR_RETURN(rustImage, const RustImage*, image);
+            m_entries->renderer_draw_image(m_renderer, rustImage->image(), blend_mode, opacity);
         }
         void drawImageMesh(const RenderImage* image,
                            rcp<RenderBuffer> vertices_f32,
@@ -338,14 +336,17 @@ extern "C"
                            BlendMode blend_mode,
                            float opacity) override
         {
-            m_entries->renderer_draw_image_mesh(
-                m_renderer,
-                static_cast<const RustImage*>(image)->image(),
-                static_cast<RustBuffer*>(vertices_f32.get())->buffer(),
-                static_cast<RustBuffer*>(uvCoords_f32.get())->buffer(),
-                static_cast<RustBuffer*>(indices_u16.get())->buffer(),
-                blend_mode,
-                opacity);
+            LITE_RTTI_CAST_OR_RETURN(rustImage, const RustImage*, image);
+            LITE_RTTI_CAST_OR_RETURN(rustVertices, RustBuffer*, vertices_f32.get());
+            LITE_RTTI_CAST_OR_RETURN(rustUVCoords, RustBuffer*, uvCoords_f32.get());
+            LITE_RTTI_CAST_OR_RETURN(rustIndices, RustBuffer*, indices_u16.get());
+            m_entries->renderer_draw_image_mesh(m_renderer,
+                                                rustImage->image(),
+                                                rustVertices->buffer(),
+                                                rustUVCoords->buffer(),
+                                                rustIndices->buffer(),
+                                                blend_mode,
+                                                opacity);
         }
     };
 
