@@ -268,22 +268,21 @@ extern "C"
             return rcp<RenderShader>(new RustShader(std::move(gradient), m_entries));
         }
 
-        std::unique_ptr<RenderPath> makeRenderPath(RawPath& path, FillRule fill_rule) override
+        rcp<RenderPath> makeRenderPath(RawPath& path, FillRule fill_rule) override
         {
             auto iter = path.begin();
-            return std::make_unique<RustPath>(
-                m_entries->path_new(&iter, path.verbs().size(), fill_rule),
-                m_entries);
+            return make_rcp<RustPath>(m_entries->path_new(&iter, path.verbs().size(), fill_rule),
+                                      m_entries);
         }
 
-        std::unique_ptr<RenderPath> makeEmptyRenderPath() override
+        rcp<RenderPath> makeEmptyRenderPath() override
         {
-            return std::make_unique<RustPath>(m_entries->path_default(), m_entries);
+            return make_rcp<RustPath>(m_entries->path_default(), m_entries);
         }
 
-        std::unique_ptr<RenderPaint> makeRenderPaint() override
+        rcp<RenderPaint> makeRenderPaint() override
         {
-            return std::make_unique<RustPaint>(m_entries->paint_default(), m_entries);
+            return make_rcp<RustPaint>(m_entries->paint_default(), m_entries);
         }
 
         rcp<RenderImage> decodeImage(Span<const uint8_t> encoded) override
