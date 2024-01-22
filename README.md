@@ -36,6 +36,21 @@ open-source runtime libraries allow them to load their animations into apps, gam
 You will need a Rust toolchain and a C compiler to build. You can can install
 the Rust toolchain using [rustup].
 
+### Get submodules
+
+To be able to compile the repo, you need to also clone/update the submodules:
+
+```bash
+$ git submodule update --init
+```
+...or, when cloning:
+
+```bash
+$ git clone --recurse-submodules git://github.com/rive-app/rive-rs.git
+```
+
+### Running the viewer
+
 To open the included viewer, run:
 
 ```bash
