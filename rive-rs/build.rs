@@ -21,11 +21,30 @@ fn all_files_with_extension<P: AsRef<Path>>(
 fn main() {
     println!("cargo:rerun-if-changed=src/ffi.cpp");
 
+    let target = env::var("TARGET").unwrap();
+
     let rive_cpp_path = env::var("RIVE_CPP_PATH")
         .map(PathBuf::from)
         .unwrap_or_else(|_| PathBuf::from("../submodules/rive-cpp"));
+    let emscripten_path = (target == "wasm32-unknown-unknown").then(|| env::var("EMSCRIPTEN_PATH")
+        .map(PathBuf::from)
+        .expect("EMSCRIPTEN_PATH environment variable must be passed when targeting wasm32-unknown-unknown"));
 
-    cc::Build::new()
+    let cc_build = || {
+        let mut cfg = cc::Build::new();
+
+        if let Some(emscripten_path) = &emscripten_path {
+            cfg.define("_LIBCPP_HAS_NO_THREADS", None)
+                .include(emscripten_path.join("system/lib/libcxx/include/"))
+                .include(emscripten_path.join("system/lib/libc/musl/include"))
+                .include(emscripten_path.join("system/lib/libc/musl/arch/emscripten/"))
+                .include(emscripten_path.join("system/include/"));
+        }
+
+        cfg
+    };
+
+    cc_build()
         .cpp(true)
         .include(rive_cpp_path.join("include"))
         .file("src/ffi.cpp")
@@ -34,10 +53,9 @@ fn main() {
         .compile("rive-ffi");
 
     if cfg!(feature = "text") {
-        let target = env::var("TARGET").unwrap();
         let profile = env::var("PROFILE").unwrap();
 
-        let mut cfg = cc::Build::new();
+        let mut cfg = cc_build();
         cfg.cpp(true)
             .flag_if_supported("-std=c++11") // for unix
             .warnings(false)
@@ -61,7 +79,7 @@ fn main() {
 
         cfg.compile("harfbuzz");
 
-        cc::Build::new()
+        cc_build()
             .files(all_files_with_extension(
                 "../submodules/SheenBidi/Source",
                 "c",
@@ -71,7 +89,7 @@ fn main() {
             .compile("sheenbidi");
     }
 
-    let mut cfg = cc::Build::new();
+    let mut cfg = cc_build();
     cfg.cpp(true)
         .include(rive_cpp_path.join("include"))
         .files(all_files_with_extension(rive_cpp_path.join("src"), "cpp"))
