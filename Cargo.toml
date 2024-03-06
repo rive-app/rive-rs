@@ -1,6 +1,8 @@
 [workspace]
-members = ["rive-rs", "examples/*"]
+# members = ["rive-rs", "examples/*"]
+members = ["rive-rs"]
+
 resolver = "2"
 
 [workspace.dependencies]
-vello = { git = "https://github.com/linebender/vello", rev = "ee3a076" }
+vello = "0.1.0"
