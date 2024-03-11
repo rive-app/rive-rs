@@ -18,7 +18,7 @@ A Rust runtime library for [Rive](https://rive.app).
 - 👨‍💻 [Contributing](#contributing)
 - ❓ [Issues](#issues)
 
-## Rive Overview
+## Rive overview
 
 [Rive](https://rive.app) is a real-time interactive design and animation tool that helps teams
 create and run interactive animations anywhere. Designers and developers use our collaborative
@@ -31,7 +31,7 @@ open-source runtime libraries allow them to load their animations into apps, gam
 
 🛠 [Learning Rive](https://rive.app/learn-rive/)
 
-## Getting Started
+## Getting started
 
 You will need a Rust toolchain and a C compiler to build. You can can install
 the Rust toolchain using [rustup].
@@ -80,7 +80,7 @@ life better? Log an issue in our [issues](https://github.com/rive-app/rive-rs/is
 can also browse older issues and discussion threads there to see solutions that may have worked for
 common problems.
 
-### Known Issues
+### Known issues
 
 The existing [Vello](https://github.com/linebender/vello) render back-end may lead to some inconsistencies in comparison to the original design:
 
