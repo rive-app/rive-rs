@@ -233,7 +233,7 @@ fn create_winit_window(event_loop: &winit::event_loop::EventLoopWindowTarget<()>
         WindowBuilder::new()
             .with_inner_size(LogicalSize::new(1044, 800))
             .with_resizable(true)
-            .with_title("Vello Shapes")
+            .with_title("Rive on Vello demo")
             .build(event_loop)
             .unwrap(),
     )
