@@ -247,7 +247,7 @@ fn create_vello_renderer(render_cx: &RenderContext, surface: &RenderSurface) -> 
             surface_format: Some(surface.format),
             use_cpu: false,
             antialiasing_support: vello::AaSupport::all(),
-            num_init_threads: NonZeroUsize::new(1),
+            num_init_threads: None,
         },
     )
     .expect("Could create renderer")
