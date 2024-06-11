@@ -13,8 +13,9 @@ license = "MIT"
 readme = "../README.md"
 
 [features]
-default = ["text"]
+default = ["text", "layout"]
 text = []
+layout = []
 vello = ["dep:bytemuck", "dep:image", "dep:smallvec", "dep:vello"]
 
 [build-dependencies]

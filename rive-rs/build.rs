@@ -33,6 +33,17 @@ fn main() {
         .warnings(false)
         .compile("rive-ffi");
 
+    if cfg!(feature = "layout") {
+        cc::Build::new()
+            .cpp(true)
+            .flag("-std=c++11")
+            .files(all_files_with_extension("../submodules/yoga/yoga", "cpp"))
+            .include("../submodules/yoga")
+            .define("YOGA_EXPORT=", None)
+            .warnings(false)
+            .compile("yoga");
+    }
+
     if cfg!(feature = "text") {
         let target = env::var("TARGET").unwrap();
         let profile = env::var("PROFILE").unwrap();
@@ -83,6 +94,12 @@ fn main() {
             .include("../submodules/SheenBidi/Headers")
             .flag_if_supported("-Wno-deprecated-declarations")
             .define("WITH_RIVE_TEXT", None);
+    }
+    if cfg!(feature = "layout") {
+        cfg.include("../submodules/yoga")
+            .flag_if_supported("-Wno-deprecated-declarations")
+            .define("WITH_RIVE_LAYOUT", None)
+            .define("YOGA_EXPORT=", None);
     }
 
     cfg.compile("rive");
