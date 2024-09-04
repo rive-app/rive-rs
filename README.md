@@ -27,9 +27,9 @@ open-source runtime libraries allow them to load their animations into apps, gam
 
 🏡 [Homepage](https://rive.app/)
 
-📘 [General help docs](https://help.rive.app/)
+📘 [Rive Documentation](https://rive.app/community/doc)
 
-🛠 [Learning Rive](https://rive.app/learn-rive/)
+🛠 [Rive Forums](https://rive.app/community/forums/home)
 
 ## Getting started
 
