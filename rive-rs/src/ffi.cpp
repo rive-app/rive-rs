@@ -31,7 +31,9 @@ extern "C"
     typedef struct RawRustString RawRustString;
     typedef struct RawRustBTreeMap RawRustBTreeMap;
 
-    void rive_rs_allocate_string(const RawRustString* string, const char* data, size_t len);
+    void rive_rs_allocate_string(const RawRustString* string,
+                                 const char* data,
+                                 size_t len);
 
     typedef struct RawString
     {
@@ -59,7 +61,9 @@ extern "C"
 
     typedef struct RendererEntries
     {
-        const RawRustBuffer* (*buffer_new)(RenderBufferType, RenderBufferFlags, size_t);
+        const RawRustBuffer* (*buffer_new)(RenderBufferType,
+                                           RenderBufferFlags,
+                                           size_t);
         void (*buffer_release)(const RawRustBuffer*);
         uint8_t* (*buffer_map)(const RawRustBuffer*);
         void (*buffer_unmap)(const RawRustBuffer*);
@@ -67,11 +71,19 @@ extern "C"
         const RawRustPath* (*path_new)(RawPath::Iter*, size_t, FillRule);
         void (*path_release)(const RawRustPath*);
         void (*path_reset)(const RawRustPath*);
-        void (*path_extend)(const RawRustPath*, const RawRustPath*, const float* transform);
+        void (*path_extend)(const RawRustPath*,
+                            const RawRustPath*,
+                            const float* transform);
         void (*path_set_fill_rule)(const RawRustPath*, FillRule);
         void (*path_move_to)(const RawRustPath*, float, float);
         void (*path_line_to)(const RawRustPath*, float, float);
-        void (*path_cubic_to)(const RawRustPath*, float, float, float, float, float, float);
+        void (*path_cubic_to)(const RawRustPath*,
+                              float,
+                              float,
+                              float,
+                              float,
+                              float,
+                              float);
         void (*path_close)(const RawRustPath*);
         const RawRustPaint* (*paint_default)();
         void (*paint_release)(const RawRustPaint*);
@@ -90,8 +102,12 @@ extern "C"
                                                       const ColorInt*,
                                                       const float*,
                                                       size_t);
-        const RawRustGradient* (
-            *gradient_new_radial)(float, float, float, const ColorInt*, const float*, size_t);
+        const RawRustGradient* (*gradient_new_radial)(float,
+                                                      float,
+                                                      float,
+                                                      const ColorInt*,
+                                                      const float*,
+                                                      size_t);
         void (*gradient_release)(const RawRustGradient*);
         const RawRustImage* (*image_decode)(const uint8_t*, size_t);
         void (*image_release)(const RawRustImage*);
@@ -99,8 +115,13 @@ extern "C"
         void (*renderer_state_pop)(const RawRustRenderer*);
         void (*renderer_transform)(const RawRustRenderer*, const float*);
         void (*renderer_set_clip)(const RawRustRenderer*, const RawRustPath*);
-        void (*renderer_draw_path)(const RawRustRenderer*, const RawRustPath*, const RawRustPaint*);
-        void (*renderer_draw_image)(const RawRustRenderer*, const RawRustImage*, BlendMode, float);
+        void (*renderer_draw_path)(const RawRustRenderer*,
+                                   const RawRustPath*,
+                                   const RawRustPaint*);
+        void (*renderer_draw_image)(const RawRustRenderer*,
+                                    const RawRustImage*,
+                                    BlendMode,
+                                    float);
         void (*renderer_draw_image_mesh)(const RawRustRenderer*,
                                          const RawRustImage*,
                                          const RawRustBuffer*,
@@ -129,7 +150,10 @@ extern "C"
 
         const RawRustBuffer* buffer() const { return m_buffer; }
 
-        void* onMap() override { return static_cast<void*>(m_entries->buffer_map(m_buffer)); }
+        void* onMap() override
+        {
+            return static_cast<void*>(m_entries->buffer_map(m_buffer));
+        }
         void onUnmap() override { m_entries->buffer_unmap(m_buffer); }
     };
 
@@ -140,7 +164,8 @@ extern "C"
         const RendererEntries* m_entries;
 
     public:
-        RustShader(const RawRustGradient* gradient, const RendererEntries* entries) :
+        RustShader(const RawRustGradient* gradient,
+                   const RendererEntries* entries) :
             m_gradient(gradient), m_entries(entries)
         {}
         ~RustShader() override { m_entries->gradient_release(m_gradient); }
@@ -181,12 +206,24 @@ extern "C"
         void addRenderPath(RenderPath* path, const Mat2D& transform) override
         {
             LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
-            m_entries->path_extend(m_path, rustPath->m_path, transform.values());
+            m_entries->path_extend(m_path,
+                                   rustPath->m_path,
+                                   transform.values());
         }
-        void fillRule(FillRule value) override { m_entries->path_set_fill_rule(m_path, value); }
-        void moveTo(float x, float y) override { m_entries->path_move_to(m_path, x, y); }
-        void lineTo(float x, float y) override { m_entries->path_line_to(m_path, x, y); }
-        void cubicTo(float ox, float oy, float ix, float iy, float x, float y) override
+        void fillRule(FillRule value) override
+        {
+            m_entries->path_set_fill_rule(m_path, value);
+        }
+        void moveTo(float x, float y) override
+        {
+            m_entries->path_move_to(m_path, x, y);
+        }
+        void lineTo(float x, float y) override
+        {
+            m_entries->path_line_to(m_path, x, y);
+        }
+        void cubicTo(float ox, float oy, float ix, float iy, float x, float y)
+            override
         {
             m_entries->path_cubic_to(m_path, ox, oy, ix, iy, x, y);
         }
@@ -207,11 +244,26 @@ extern "C"
 
         const RawRustPaint* paint() const { return m_paint; }
 
-        void style(RenderPaintStyle style) override { m_entries->paint_set_style(m_paint, style); }
-        void color(unsigned int value) override { m_entries->paint_set_color(m_paint, value); }
-        void thickness(float value) override { m_entries->paint_set_thickness(m_paint, value); }
-        void join(StrokeJoin value) override { m_entries->paint_set_join(m_paint, value); }
-        void cap(StrokeCap value) override { m_entries->paint_set_cap(m_paint, value); }
+        void style(RenderPaintStyle style) override
+        {
+            m_entries->paint_set_style(m_paint, style);
+        }
+        void color(unsigned int value) override
+        {
+            m_entries->paint_set_color(m_paint, value);
+        }
+        void thickness(float value) override
+        {
+            m_entries->paint_set_thickness(m_paint, value);
+        }
+        void join(StrokeJoin value) override
+        {
+            m_entries->paint_set_join(m_paint, value);
+        }
+        void cap(StrokeCap value) override
+        {
+            m_entries->paint_set_cap(m_paint, value);
+        }
         void blendMode(BlendMode value) override
         {
             m_entries->paint_set_blend_mode(m_paint, value);
@@ -225,7 +277,10 @@ extern "C"
                 m_entries->paint_set_gradient(m_paint, rustShader->gradient());
             }
         }
-        void invalidateStroke() override { m_entries->paint_invalidate_stroke(m_paint); }
+        void invalidateStroke() override
+        {
+            m_entries->paint_invalidate_stroke(m_paint);
+        }
     };
 
     class RustFactory : public Factory
@@ -240,7 +295,8 @@ extern "C"
                                            RenderBufferFlags flags,
                                            size_t len_in_bytes) override
         {
-            return rcp<RenderBuffer>(new RustBuffer(type, flags, len_in_bytes, m_entries));
+            return rcp<RenderBuffer>(
+                new RustBuffer(type, flags, len_in_bytes, m_entries));
         }
 
         rcp<RenderShader> makeLinearGradient(float sx,
@@ -252,8 +308,10 @@ extern "C"
                                              size_t count) override
         {
             const RawRustGradient* gradient =
-                m_entries->gradient_new_linear(sx, sy, ex, ey, colors, stops, count);
-            return rcp<RenderShader>(new RustShader(std::move(gradient), m_entries));
+                m_entries
+                    ->gradient_new_linear(sx, sy, ex, ey, colors, stops, count);
+            return rcp<RenderShader>(
+                new RustShader(std::move(gradient), m_entries));
         }
 
         rcp<RenderShader> makeRadialGradient(float cx,
@@ -264,15 +322,19 @@ extern "C"
                                              size_t count) override
         {
             const RawRustGradient* gradient =
-                m_entries->gradient_new_radial(cx, cy, radius, colors, stops, count);
-            return rcp<RenderShader>(new RustShader(std::move(gradient), m_entries));
+                m_entries
+                    ->gradient_new_radial(cx, cy, radius, colors, stops, count);
+            return rcp<RenderShader>(
+                new RustShader(std::move(gradient), m_entries));
         }
 
-        rcp<RenderPath> makeRenderPath(RawPath& path, FillRule fill_rule) override
+        rcp<RenderPath> makeRenderPath(RawPath& path,
+                                       FillRule fill_rule) override
         {
             auto iter = path.begin();
-            return make_rcp<RustPath>(m_entries->path_new(&iter, path.verbs().size(), fill_rule),
-                                      m_entries);
+            return make_rcp<RustPath>(
+                m_entries->path_new(&iter, path.verbs().size(), fill_rule),
+                m_entries);
         }
 
         rcp<RenderPath> makeEmptyRenderPath() override
@@ -287,8 +349,9 @@ extern "C"
 
         rcp<RenderImage> decodeImage(Span<const uint8_t> encoded) override
         {
-            return make_rcp<RustImage>(m_entries->image_decode(encoded.data(), encoded.size()),
-                                       m_entries);
+            return make_rcp<RustImage>(
+                m_entries->image_decode(encoded.data(), encoded.size()),
+                m_entries);
         }
     };
 
@@ -299,7 +362,8 @@ extern "C"
         const RendererEntries* m_entries;
 
     public:
-        RustRenderer(const RawRustRenderer* renderer, const RendererEntries* entries) :
+        RustRenderer(const RawRustRenderer* renderer,
+                     const RendererEntries* entries) :
             m_renderer(renderer), m_entries(entries)
         {}
         ~RustRenderer() override {}
@@ -319,12 +383,19 @@ extern "C"
         {
             LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
             LITE_RTTI_CAST_OR_RETURN(rustPaint, RustPaint*, paint);
-            m_entries->renderer_draw_path(m_renderer, rustPath->path(), rustPaint->paint());
+            m_entries->renderer_draw_path(m_renderer,
+                                          rustPath->path(),
+                                          rustPaint->paint());
         }
-        void drawImage(const RenderImage* image, BlendMode blend_mode, float opacity) override
+        void drawImage(const RenderImage* image,
+                       BlendMode blend_mode,
+                       float opacity) override
         {
             LITE_RTTI_CAST_OR_RETURN(rustImage, const RustImage*, image);
-            m_entries->renderer_draw_image(m_renderer, rustImage->image(), blend_mode, opacity);
+            m_entries->renderer_draw_image(m_renderer,
+                                           rustImage->image(),
+                                           blend_mode,
+                                           opacity);
         }
         void drawImageMesh(const RenderImage* image,
                            rcp<RenderBuffer> vertices_f32,
@@ -336,9 +407,15 @@ extern "C"
                            float opacity) override
         {
             LITE_RTTI_CAST_OR_RETURN(rustImage, const RustImage*, image);
-            LITE_RTTI_CAST_OR_RETURN(rustVertices, RustBuffer*, vertices_f32.get());
-            LITE_RTTI_CAST_OR_RETURN(rustUVCoords, RustBuffer*, uvCoords_f32.get());
-            LITE_RTTI_CAST_OR_RETURN(rustIndices, RustBuffer*, indices_u16.get());
+            LITE_RTTI_CAST_OR_RETURN(rustVertices,
+                                     RustBuffer*,
+                                     vertices_f32.get());
+            LITE_RTTI_CAST_OR_RETURN(rustUVCoords,
+                                     RustBuffer*,
+                                     uvCoords_f32.get());
+            LITE_RTTI_CAST_OR_RETURN(rustIndices,
+                                     RustBuffer*,
+                                     indices_u16.get());
             m_entries->renderer_draw_image_mesh(m_renderer,
                                                 rustImage->image(),
                                                 rustVertices->buffer(),
@@ -408,10 +485,11 @@ extern "C"
         }
     }
 
-    void rive_rs_instantiate_artboard_by_name(const File* file,
-                                              const char* data,
-                                              size_t len,
-                                              ArtboardInstance** artboard_instance)
+    void rive_rs_instantiate_artboard_by_name(
+        const File* file,
+        const char* data,
+        size_t len,
+        ArtboardInstance** artboard_instance)
     {
         *artboard_instance = file->artboardNamed({data, len}).release();
 
@@ -421,26 +499,34 @@ extern "C"
         }
     }
 
-    void rive_rs_artboard_instance_release(const ArtboardInstance* artboard_instance)
+    void rive_rs_artboard_instance_release(
+        const ArtboardInstance* artboard_instance)
     {
         std::unique_ptr<ArtboardInstance> val(
             std::move(const_cast<ArtboardInstance*>(artboard_instance)));
     }
 
-    size_t rive_rs_artboard_component_count(const ArtboardInstance* artboard_instance)
+    size_t rive_rs_artboard_component_count(
+        const ArtboardInstance* artboard_instance)
     {
         return artboard_instance->objects().size();
     }
 
-    const Core* rive_rs_artboard_get_component(const ArtboardInstance* artboard_instance,
-                                               size_t index)
+    const Core* rive_rs_artboard_get_component(
+        const ArtboardInstance* artboard_instance,
+        size_t index)
     {
         return artboard_instance->objects()[index];
     }
 
-    uint16_t rive_rs_component_type_id(const Core* component) { return component->coreType(); }
+    uint16_t rive_rs_component_type_id(const Core* component)
+    {
+        return component->coreType();
+    }
 
-    void rive_rs_component_name(const Component* component, const char** data, size_t* len)
+    void rive_rs_component_name(const Component* component,
+                                const char** data,
+                                size_t* len)
     {
         if (static_cast<const Core*>(component)->is<Component>())
         {
@@ -461,20 +547,24 @@ extern "C"
         *len = text_value_run->text().size();
     }
 
-    void rive_rs_text_value_run_set_text(TextValueRun* text_value_run, const char* data, size_t len)
+    void rive_rs_text_value_run_set_text(TextValueRun* text_value_run,
+                                         const char* data,
+                                         size_t len)
     {
         text_value_run->text({data, len});
     }
 
-    void rive_rs_instantiate_linear_animation(ArtboardInstance* artboard_instance,
-                                              const size_t* index,
-                                              LinearAnimationInstance** linear_animation)
+    void rive_rs_instantiate_linear_animation(
+        ArtboardInstance* artboard_instance,
+        const size_t* index,
+        LinearAnimationInstance** linear_animation)
     {
         if (index)
         {
             if (*index < (size_t)artboard_instance->animationCount())
             {
-                *linear_animation = artboard_instance->animationAt(*index).release();
+                *linear_animation =
+                    artboard_instance->animationAt(*index).release();
             }
         }
         else
@@ -487,56 +577,71 @@ extern "C"
         }
     }
 
-    void rive_rs_instantiate_linear_animation_by_name(ArtboardInstance* artboard_instance,
-                                                      const char* data,
-                                                      size_t len,
-                                                      LinearAnimationInstance** linear_animation)
+    void rive_rs_instantiate_linear_animation_by_name(
+        ArtboardInstance* artboard_instance,
+        const char* data,
+        size_t len,
+        LinearAnimationInstance** linear_animation)
     {
-        *linear_animation = artboard_instance->animationNamed({data, len}).release();
+        *linear_animation =
+            artboard_instance->animationNamed({data, len}).release();
     }
 
-    float rive_rs_linear_animation_time(const LinearAnimationInstance* linear_animation)
+    float rive_rs_linear_animation_time(
+        const LinearAnimationInstance* linear_animation)
     {
         return linear_animation->time();
     }
 
-    void rive_rs_linear_animation_set_time(LinearAnimationInstance* linear_animation, float time)
+    void rive_rs_linear_animation_set_time(
+        LinearAnimationInstance* linear_animation,
+        float time)
     {
         linear_animation->time(time);
     }
 
-    bool rive_rs_linear_animation_is_forwards(const LinearAnimationInstance* linear_animation)
+    bool rive_rs_linear_animation_is_forwards(
+        const LinearAnimationInstance* linear_animation)
     {
         return linear_animation->direction() == 1;
     }
 
-    void rive_rs_linear_animation_set_is_forwards(LinearAnimationInstance* linear_animation,
-                                                  bool is_forwards)
+    void rive_rs_linear_animation_set_is_forwards(
+        LinearAnimationInstance* linear_animation,
+        bool is_forwards)
     {
         linear_animation->direction(is_forwards ? 1 : -1);
     }
 
-    bool rive_rs_linear_animation_advance(LinearAnimationInstance* linear_animation, float elapsed)
+    bool rive_rs_linear_animation_advance(
+        LinearAnimationInstance* linear_animation,
+        float elapsed)
     {
         return linear_animation->advance(elapsed);
     }
 
-    void rive_rs_linear_animation_apply(const LinearAnimationInstance* linear_animation, float mix)
+    void rive_rs_linear_animation_apply(
+        const LinearAnimationInstance* linear_animation,
+        float mix)
     {
         linear_animation->apply(mix);
     }
 
-    bool rive_rs_linear_animation_did_loop(const LinearAnimationInstance* linear_animation)
+    bool rive_rs_linear_animation_did_loop(
+        const LinearAnimationInstance* linear_animation)
     {
         return linear_animation->didLoop();
     }
 
-    void rive_rs_linear_animation_set_loop(LinearAnimationInstance* linear_animation, Loop loop)
+    void rive_rs_linear_animation_set_loop(
+        LinearAnimationInstance* linear_animation,
+        Loop loop)
     {
         linear_animation->loopValue(static_cast<int>(loop));
     }
 
-    bool rive_rs_linear_animation_is_done(const LinearAnimationInstance* linear_animation)
+    bool rive_rs_linear_animation_is_done(
+        const LinearAnimationInstance* linear_animation)
     {
         return !linear_animation->keepGoing();
     }
@@ -550,7 +655,8 @@ extern "C"
         {
             if (*index < (size_t)artboard_instance->stateMachineCount())
             {
-                *state_machine = artboard_instance->stateMachineAt(*index).release();
+                *state_machine =
+                    artboard_instance->stateMachineAt(*index).release();
             }
         }
         else
@@ -567,35 +673,42 @@ extern "C"
         }
     }
 
-    void rive_rs_instantiate_state_machine_by_name(ArtboardInstance* artboard_instance,
-                                                   const char* data,
-                                                   size_t len,
-                                                   StateMachineInstance** state_machine)
+    void rive_rs_instantiate_state_machine_by_name(
+        ArtboardInstance* artboard_instance,
+        const char* data,
+        size_t len,
+        StateMachineInstance** state_machine)
     {
-        *state_machine = artboard_instance->stateMachineNamed({data, len}).release();
+        *state_machine =
+            artboard_instance->stateMachineNamed({data, len}).release();
     }
 
-    void rive_rs_state_machine_get_event(const StateMachineInstance* state_machine_instance,
-                                         size_t index,
-                                         Event** event,
-                                         float* delay)
+    void rive_rs_state_machine_get_event(
+        const StateMachineInstance* state_machine_instance,
+        size_t index,
+        Event** event,
+        float* delay)
     {
         auto event_report = state_machine_instance->reportedEventAt(index);
         *event = event_report.event();
         *delay = event_report.secondsDelay();
     }
 
-    size_t rive_rs_state_machine_event_count(const StateMachineInstance* state_machine_instance)
+    size_t rive_rs_state_machine_event_count(
+        const StateMachineInstance* state_machine_instance)
     {
         return state_machine_instance->reportedEventCount();
     }
 
     void rive_rs_event_name(const Event* event, const RawRustString* string)
     {
-        rive_rs_allocate_string(string, event->name().data(), event->name().size());
+        rive_rs_allocate_string(string,
+                                event->name().data(),
+                                event->name().size());
     }
 
-    void rive_rs_event_properties(const Event* event, const RawRustBTreeMap* properties)
+    void rive_rs_event_properties(const Event* event,
+                                  const RawRustBTreeMap* properties)
     {
         for (auto child : event->children())
         {
@@ -651,10 +764,11 @@ extern "C"
         }
     }
 
-    void rive_rs_state_machine_get_input(const StateMachineInstance* state_machine_instance,
-                                         size_t index,
-                                         InputTag* input_tag,
-                                         SMIInput** input)
+    void rive_rs_state_machine_get_input(
+        const StateMachineInstance* state_machine_instance,
+        size_t index,
+        InputTag* input_tag,
+        SMIInput** input)
     {
         *input = state_machine_instance->input(index);
 
@@ -674,7 +788,8 @@ extern "C"
         }
     }
 
-    size_t rive_rs_state_machine_input_count(const StateMachineInstance* state_machine_instance)
+    size_t rive_rs_state_machine_input_count(
+        const StateMachineInstance* state_machine_instance)
     {
         return state_machine_instance->inputCount();
     }
@@ -709,7 +824,9 @@ extern "C"
         return state_machine_instance->getTrigger({name, len});
     }
 
-    void rive_rs_input_name(const SMIInput* input, const char** data, size_t* len)
+    void rive_rs_input_name(const SMIInput* input,
+                            const char** data,
+                            size_t* len)
     {
         *data = input->name().data();
         *len = input->name().size();
@@ -719,9 +836,15 @@ extern "C"
 
     void rive_rs_bool_set(SMIBool* bool_, bool val) { bool_->value(val); }
 
-    float rive_rs_number_get(const SMINumber* number) { return number->value(); }
+    float rive_rs_number_get(const SMINumber* number)
+    {
+        return number->value();
+    }
 
-    void rive_rs_number_set(SMINumber* number, float val) { number->value(val); }
+    void rive_rs_number_set(SMINumber* number, float val)
+    {
+        number->value(val);
+    }
 
     void rive_rs_trigger_fire(SMITrigger* trigger) { trigger->fire(); }
 
@@ -743,9 +866,15 @@ extern "C"
 
     Loop rive_rs_scene_loop(const Scene* scene) { return scene->loop(); }
 
-    bool rive_rs_scene_is_translucent(const Scene* scene) { return scene->isTranslucent(); }
+    bool rive_rs_scene_is_translucent(const Scene* scene)
+    {
+        return scene->isTranslucent();
+    }
 
-    float rive_rs_scene_duration(const Scene* scene) { return scene->durationSeconds(); }
+    float rive_rs_scene_duration(const Scene* scene)
+    {
+        return scene->durationSeconds();
+    }
 
     bool rive_rs_scene_advance_and_apply(Scene* scene, float elapsed)
     {
@@ -760,25 +889,38 @@ extern "C"
         scene->draw(&rust_renderer);
     }
 
-    void rive_rs_scene_pointer_down(Scene* scene, float x, float y) { scene->pointerDown({x, y}); }
-
-    void rive_rs_scene_pointer_move(Scene* scene, float x, float y) { scene->pointerMove({x, y}); }
-
-    void rive_rs_scene_pointer_up(Scene* scene, float x, float y) { scene->pointerUp({x, y}); }
-
-    void rive_rs_artboard_instance_transforms(const ArtboardInstance* artboard_instance,
-                                              uint32_t width,
-                                              uint32_t height,
-                                              float* view_transform,
-                                              float* inverse_view_transform)
+    void rive_rs_scene_pointer_down(Scene* scene, float x, float y)
     {
-        auto view_transform_mat = rive::computeAlignment(rive::Fit::contain,
-                                                         rive::Alignment::center,
-                                                         rive::AABB(0, 0, width, height),
-                                                         artboard_instance->bounds());
+        scene->pointerDown({x, y});
+    }
+
+    void rive_rs_scene_pointer_move(Scene* scene, float x, float y)
+    {
+        scene->pointerMove({x, y});
+    }
+
+    void rive_rs_scene_pointer_up(Scene* scene, float x, float y)
+    {
+        scene->pointerUp({x, y});
+    }
+
+    void rive_rs_artboard_instance_transforms(
+        const ArtboardInstance* artboard_instance,
+        uint32_t width,
+        uint32_t height,
+        float* view_transform,
+        float* inverse_view_transform)
+    {
+        auto view_transform_mat =
+            rive::computeAlignment(rive::Fit::contain,
+                                   rive::Alignment::center,
+                                   rive::AABB(0, 0, width, height),
+                                   artboard_instance->bounds());
         auto inverse_view_transform_mat = view_transform_mat.invertOrIdentity();
 
-        std::copy(view_transform_mat.values(), view_transform_mat.values() + 6, view_transform);
+        std::copy(view_transform_mat.values(),
+                  view_transform_mat.values() + 6,
+                  view_transform);
         std::copy(inverse_view_transform_mat.values(),
                   inverse_view_transform_mat.values() + 6,
                   inverse_view_transform);
