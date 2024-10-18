@@ -131,7 +131,7 @@ extern "C"
                                          float);
     } RendererEntries;
 
-    class RustBuffer : public lite_rtti_override<RenderBuffer, RustBuffer>
+    class RustBuffer : public LITE_RTTI_OVERRIDE(RenderBuffer, RustBuffer)
     {
     private:
         const RawRustBuffer* m_buffer;
@@ -157,7 +157,7 @@ extern "C"
         void onUnmap() override { m_entries->buffer_unmap(m_buffer); }
     };
 
-    class RustShader : public lite_rtti_override<RenderShader, RustShader>
+    class RustShader : public LITE_RTTI_OVERRIDE(RenderShader, RustShader)
     {
     private:
         const RawRustGradient* m_gradient;
@@ -173,7 +173,7 @@ extern "C"
         const RawRustGradient* gradient() const { return m_gradient; }
     };
 
-    class RustImage : public lite_rtti_override<RenderImage, RustImage>
+    class RustImage : public LITE_RTTI_OVERRIDE(RenderImage, RustImage)
     {
     private:
         const RawRustImage* m_image;
@@ -188,7 +188,7 @@ extern "C"
         const RawRustImage* image() const { return m_image; }
     };
 
-    class RustPath : public lite_rtti_override<RenderPath, RustPath>
+    class RustPath : public LITE_RTTI_OVERRIDE(RenderPath, RustPath)
     {
     private:
         const RawRustPath* m_path;
@@ -230,7 +230,7 @@ extern "C"
         virtual void close() override { m_entries->path_close(m_path); }
     };
 
-    class RustPaint : public lite_rtti_override<RenderPaint, RustPaint>
+    class RustPaint : public LITE_RTTI_OVERRIDE(RenderPaint, RustPaint)
     {
     private:
         const RawRustPaint* m_paint;
