@@ -87,6 +87,7 @@ fn main() {
         .include(rive_cpp_path.join("include"))
         .files(all_files_with_extension(rive_cpp_path.join("src"), "cpp"))
         .flag("-std=c++14")
+        .define("_RIVE_INTERNAL_", None)
         .warnings(false);
 
     if cfg!(feature = "text") {
