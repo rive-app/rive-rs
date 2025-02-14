@@ -203,6 +203,19 @@ extern "C"
         const RawRustPath* path() const { return m_path; }
 
         void rewind() override { m_entries->path_reset(m_path); }
+
+        void addRawPath(const RawPath& path) override
+        {
+            auto iter = path.begin();
+            auto renderPath =
+                make_rcp<RustPath>(m_entries->path_new(&iter,
+                                                       path.verbs().size(),
+                                                       FillRule::nonZero),
+                                   m_entries);
+            Mat2D transform;
+            addRenderPath(renderPath.get(), transform);
+        }
+
         void addRenderPath(RenderPath* path, const Mat2D& transform) override
         {
             LITE_RTTI_CAST_OR_RETURN(rustPath, RustPath*, path);
