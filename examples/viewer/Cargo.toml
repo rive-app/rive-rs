@@ -7,6 +7,6 @@ publish = false
 [dependencies]
 pollster = "0.3.0"
 rive-rs = { path = "../../rive-rs", features = ["vello"] }
-vello = { workspace = true }
-wgpu = "0.17.0"
-winit = "0.28.6"
+vello = "0.1.0"
+wgpu = "0.19.3"
+winit = "0.29.13"
