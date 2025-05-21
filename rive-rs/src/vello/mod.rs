@@ -1,14 +1,11 @@
 use std::{fmt, io::Cursor};
 
-use image::io::Reader;
-use smallvec::SmallVec;
+use image::ImageReader;
 use vello::{
-    kurbo::{Affine, BezPath, Line, PathSeg, Point, Rect, Shape, Vec2},
+    kurbo::{Affine, BezPath, Cap, Join, Line, PathSeg, Point, Rect, Shape, Stroke, Vec2},
     peniko::{
-        self, BlendMode, Brush, BrushRef, Cap, Color, ColorStop, ColorStopsSource, Fill, Format,
-        Join, Mix, Stroke,
-    },
-    SceneBuilder, SceneFragment,
+        self, color::DynamicColor, BlendMode, Brush, BrushRef, Color, ColorStop, ColorStops, ColorStopsSource, Fill, ImageFormat, Mix
+    }, Scene,
 };
 
 mod util;
@@ -18,7 +15,7 @@ use util::ScaleFromOrigin;
 use crate::renderer;
 
 fn to_vello_color(color: renderer::Color) -> Color {
-    Color::rgba8(color.r, color.g, color.b, color.a)
+    Color::from_rgba8(color.r, color.g, color.b, color.a)
 }
 
 fn to_vello_mix(blend_mode: renderer::BlendMode) -> Mix {
@@ -185,14 +182,14 @@ struct SliceStops<'s> {
 }
 
 impl ColorStopsSource for SliceStops<'_> {
-    fn collect_stops(&self, vec: &mut SmallVec<[ColorStop; 4]>) {
-        vec.extend(
+    fn collect_stops(self, vec: &mut ColorStops) {
+        vec.0.extend(
             self.colors
                 .iter()
                 .zip(self.stops.iter())
                 .map(|(&color, &offset)| ColorStop {
                     offset,
-                    color: to_vello_color(color),
+                    color: DynamicColor::from_alpha_color(to_vello_color(color)),
                 }),
         );
     }
@@ -242,7 +239,7 @@ impl renderer::Paint for Paint {
     fn set_thickness(&mut self, thickness: f32) {
         loop {
             if let RenderStyle::Stroke(stroke) = &mut self.style {
-                stroke.width = thickness;
+                stroke.width = thickness as f64;
                 break;
             } else {
                 self.style = RenderStyle::Stroke(Stroke::new(0.0));
@@ -341,7 +338,7 @@ pub struct Image {
 
 impl renderer::Image for Image {
     fn decode(data: &[u8]) -> Option<Self> {
-        let image = Reader::new(Cursor::new(data))
+        let image = ImageReader::new(Cursor::new(data))
             .with_guessed_format()
             .ok()?
             .decode()
@@ -351,24 +348,23 @@ impl renderer::Image for Image {
         let height = image.height();
 
         Some(Image {
-            inner: peniko::Image::new(image.into_raw().into(), Format::Rgba8, width, height),
+            inner: peniko::Image::new(image.into_raw().into(), ImageFormat::Rgba8, width, height),
         })
     }
 }
 
 pub struct Renderer {
-    scene: Box<SceneFragment>,
-    builder: SceneBuilder<'static>,
+    scene: Box<vello::Scene>,
     transforms: Vec<Affine>,
     clips: Vec<bool>,
 }
 
 impl Renderer {
-    pub fn scene(&self) -> &SceneFragment {
+    pub fn scene(&self) -> &Scene {
         &self.scene
     }
 
-    pub fn into_scene(self) -> SceneFragment {
+    pub fn into_scene(self) -> Scene {
         *self.scene
     }
 
@@ -384,19 +380,10 @@ impl Renderer {
 impl Default for Renderer {
     #[inline]
     fn default() -> Self {
-        let mut scene = Box::<SceneFragment>::default();
-        let builder = {
-            let scene_mut: &mut SceneFragment = &mut scene;
-            SceneBuilder::for_fragment(unsafe {
-                // Quite a hack until we have a better way to do this in Vello.
-                // Pretend that the scene fragment pointer lives for 'static.
-                std::mem::transmute(scene_mut)
-            })
-        };
+        let scene = Box::<Scene>::default();
 
         Self {
             scene,
-            builder,
             transforms: vec![Affine::IDENTITY],
             clips: vec![false],
         }
@@ -426,7 +413,7 @@ impl renderer::Renderer for Renderer {
     fn state_pop(&mut self) {
         self.transforms.pop();
         if self.clips.pop().unwrap_or_default() {
-            self.builder.pop_layer();
+            self.scene.pop_layer();
         }
 
         if self.transforms.is_empty() {
@@ -446,10 +433,10 @@ impl renderer::Renderer for Renderer {
         let transform = *self.last_transform();
 
         if *self.last_clip() {
-            self.builder.pop_layer();
+            self.scene.pop_layer();
         }
 
-        self.builder
+        self.scene
             .push_layer(Mix::Clip, 1.0, transform, &path.inner);
 
         *self.last_clip() = true;
@@ -459,7 +446,7 @@ impl renderer::Renderer for Renderer {
     fn draw_path(&mut self, path: &Self::Path, paint: &Self::Paint) {
         let transform = *self.last_transform();
 
-        let builder = &mut self.builder;
+        let builder = &mut self.scene;
 
         let skip_blending = paint.blend_mode == Mix::Normal.into();
 
@@ -492,7 +479,7 @@ impl renderer::Renderer for Renderer {
         ));
         let rect = Rect::new(0.0, 0.0, image.width as f64, image.height as f64);
 
-        let builder = &mut self.builder;
+        let builder = &mut self.scene;
 
         let skip_blending = mix == Mix::Normal && opacity == 1.0;
 
@@ -546,7 +533,7 @@ impl renderer::Renderer for Renderer {
             let brush_transform =
                 util::map_uvs_to_triangle(&points, &uvs, image.width, image.height);
 
-            let builder = &mut self.builder;
+            let builder = &mut self.scene;
 
             let skip_blending = mix == Mix::Normal;
 
