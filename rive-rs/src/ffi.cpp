@@ -401,6 +401,7 @@ extern "C"
                                           rustPaint->paint());
         }
         void drawImage(const RenderImage* image,
+                       const rive::ImageSampler options,
                        BlendMode blend_mode,
                        float opacity) override
         {
@@ -411,6 +412,7 @@ extern "C"
                                            opacity);
         }
         void drawImageMesh(const RenderImage* image,
+                           const rive::ImageSampler options,
                            rcp<RenderBuffer> vertices_f32,
                            rcp<RenderBuffer> uvCoords_f32,
                            rcp<RenderBuffer> indices_u16,
