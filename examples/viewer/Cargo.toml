@@ -8,5 +8,11 @@ publish = false
 pollster = "0.3.0"
 rive-rs = { path = "../../rive-rs", features = ["vello"] }
 vello = { workspace = true }
-wgpu = "0.17.0"
-winit = "0.28.6"
+winit = "0.30.10"
+anyhow = "1.0.98"
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+panic = "abort"
