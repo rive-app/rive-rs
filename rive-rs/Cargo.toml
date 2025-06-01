@@ -13,18 +13,17 @@ license = "MIT"
 readme = "../README.md"
 
 [features]
-default = ["text", "layout"]
+default = ["text"]
 text = []
 layout = []
-vello = ["dep:bytemuck", "dep:image", "dep:smallvec", "dep:vello"]
+vello = ["dep:bytemuck", "dep:image", "dep:vello"]
 
 [build-dependencies]
-cc = { version = "1.0.83", features = ["parallel"] }
-walkdir = "2.4.0"
+cc = { version = "1", features = ["parallel"] }
+walkdir = "2.5.0"
 
 [dependencies]
-bitflags = "2.4.0"
-bytemuck = { version = "1.14.0", optional = true }
-image = { version = "0.24.6", optional = true }
-smallvec = { version = "1.8.0", optional = true }
+bitflags = "2.9.1"
+bytemuck = { version = "1.23.0", optional = true }
+image = { version = "0.25.6", optional = true }
 vello = { workspace = true, optional = true }

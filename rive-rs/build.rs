@@ -29,14 +29,12 @@ fn main() {
         .cpp(true)
         .include(rive_cpp_path.join("include"))
         .file("src/ffi.cpp")
-        .flag("-std=c++14")
         .warnings(false)
         .compile("rive-ffi");
 
     if cfg!(feature = "layout") {
         cc::Build::new()
             .cpp(true)
-            .flag("-std=c++11")
             .files(all_files_with_extension("../submodules/yoga/yoga", "cpp"))
             .include("../submodules/yoga")
             .define("YOGA_EXPORT=", None)
@@ -50,7 +48,6 @@ fn main() {
 
         let mut cfg = cc::Build::new();
         cfg.cpp(true)
-            .flag_if_supported("-std=c++11") // for unix
             .warnings(false)
             .file("../submodules/harfbuzz/src/harfbuzz.cc");
 
@@ -86,7 +83,6 @@ fn main() {
     cfg.cpp(true)
         .include(rive_cpp_path.join("include"))
         .files(all_files_with_extension(rive_cpp_path.join("src"), "cpp"))
-        .flag("-std=c++14")
         .define("_RIVE_INTERNAL_", None)
         .warnings(false);
 
