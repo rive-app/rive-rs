@@ -390,7 +390,7 @@ impl Default for Renderer {
             SceneBuilder::for_fragment(unsafe {
                 // Quite a hack until we have a better way to do this in Vello.
                 // Pretend that the scene fragment pointer lives for 'static.
-                std::mem::transmute(scene_mut)
+                std::mem::transmute::<&mut SceneFragment, &'static mut SceneFragment>(scene_mut)
             })
         };
 
